@@ -8,4 +8,4 @@ class LoginView(View):
        return render(request, 'login/index.html')
 
    def post(self, request):
-       return HttpResponse(f'<h1>Hello, World</h1>')
+       return JsonResponse(request.POST, json_dumps_params={'indent':4})
