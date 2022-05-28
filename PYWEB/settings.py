@@ -42,7 +42,11 @@ INSTALLED_APPS = [
 
     'common',
     'login',
-    'blog'
+    'blog',
+    'blog_api',
+
+    'rest_framework',
+
 
 ]
 
@@ -117,7 +121,7 @@ TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
