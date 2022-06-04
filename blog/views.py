@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from django.views import View, generic
-
 from .models import Note
-
 
 
 class BlogView(View):
@@ -16,6 +14,7 @@ class BlogView(View):
         }
 
         return render(request, ..., context)
+
 
 class HomeTemplateView(generic.TemplateView):
     template_name = ...  # todo set template

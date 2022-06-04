@@ -48,7 +48,6 @@ class NoteDetailAPIView(APIView):
         serializer = serializers.NoteDetailSerializer(
             instance=note,
         )
-
         return Response(serializer.data)
 
     def put(self, request, pk):
@@ -114,7 +113,6 @@ class PublicNoteListAPIView(ListAPIView):
         public = self.request.query_params.get("Public", True)
 
         return filters.public_filter(queryset, public)
-
 
 
 class CommentListCreateAPIView(APIView):
