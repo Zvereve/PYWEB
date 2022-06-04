@@ -4,13 +4,15 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
 from blog.models import Note, Comment
 from . import serializers, filters
 
 
 class NoteListCreateAPIView(APIView):
     """ Представление, которое позволяет вывести весь список записей и добавить новую запись. """
+    permission_classes = (IsAuthenticated, )
 
     def get(self, request: Request):
         objects = Note.objects.all()
@@ -21,7 +23,7 @@ class NoteListCreateAPIView(APIView):
         return Response(serializer.data)
 
     def post(self, request: Request):
-        # Передаем в сериалайзер (валидатор) данные из запроса
+        """ Передаем в сериалайзер (валидатор) данные из запроса"""
         serializer = serializers.NoteSerializer(data=request.data)
 
         # Проверка параметров
@@ -83,10 +85,13 @@ class NoteDetailAPIView(APIView):
             )
 
     def delete(self, request, pk):
+        note = Note.objects.get(pk=pk)
+        if self.request.user != note.author:
+            return Response('Вы не автор')
         try:
             note = Note.objects.get(pk=pk)
             note.delete()
-            return Response("/")
+            return Response("Удален")
         except Note.DoesNotExist:
             return Response("<h2>Note not found</h2>")
 
@@ -94,6 +99,8 @@ class NoteDetailAPIView(APIView):
 class PublicNoteListAPIView(ListAPIView):
     queryset = Note.objects.all()
     serializer_class = serializers.NoteDetailSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = filters.NoteFilter
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -108,18 +115,7 @@ class PublicNoteListAPIView(ListAPIView):
 
         return filters.public_filter(queryset, public)
 
-        # # todo выполняем оптимизацию many-to-one
-        # return queryset \
-        #     .filter(public=True) \
-        #     .order_by("-create_at")\
-        #     .select_related("author")
 
-        # # todo выполняем оптимизацию one-to-many
-        # return queryset \
-        #     .filter(public=True) \
-        #     .order_by("-create_at")\
-        #     .select_related("author")\
-        #     .prefetch_related("comment_set")
 
 class CommentListCreateAPIView(APIView):
     """ Представление, которое позволяет вывести весь список записей """

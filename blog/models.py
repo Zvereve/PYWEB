@@ -23,8 +23,8 @@ class Note(models.Model):
         return f"Дело №{self.id}"
 
     class Meta:
-        verbose_name = _("Дело")
-        verbose_name_plural = _("Список дел")
+        verbose_name = _("дело")
+        verbose_name_plural = _("список дел")
 
 
 class Comment(models.Model):

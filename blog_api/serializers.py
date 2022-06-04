@@ -51,8 +51,10 @@ class NoteDetailSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         # Конвертируем строку в дату по формату
         create_at = datetime.strptime(ret['date_add'], '%Y-%m-%dT%H:%M:%S.%f')
+        create_up = datetime.strptime(ret['date_up'], '%Y-%m-%dT%H:%M:%S.%f')
         # Конвертируем дату в строку в новом формате
         ret['date_add'] = create_at.strftime('%d %B %Y %H:%M:%S')
+        ret['date_up'] = create_at.strftime('%d %B %Y %H:%M:%S')
         return ret
 
 
