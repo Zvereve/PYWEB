@@ -7,23 +7,23 @@ from .models import Note, Comment
 @admin.register(Note)
 class NoteAdmin(admin.ModelAdmin):
 
-    list_display = ('title', 'id', 'public', 'date_up', 'author', )
-    fields = (('title', 'public'), 'message', 'date_add', 'date_up')
+    list_display = ('title', 'id', 'public', 'date_up', 'author', 'relevant', 'rating', )
+    fields = (('author', 'relevant', 'title', 'public'), 'message', 'date_add', 'date_up', 'rating', )
     readonly_fields = ('date_add', 'date_up')
     search_fields = ['title']
     #
     # Фильтры справа
-    list_filter = ('public', 'id')
+    list_filter = ('public', 'author', 'relevant', 'rating')
 
 
 @admin.register(Comment)
 class ComentAdmin(admin.ModelAdmin):
 
-    list_display = ('author', 'comment', 'note_id', 'rating', )
-    #fields = (('title', 'public'), 'message', 'date_add', 'date_up')
+    list_display = ('author', 'note', 'comment', )
+    fields = (('author', 'note'), 'comment',)
 
     #search_fields = ['title']
     #
     # Фильтры справа
-    list_filter = ('author', 'note_id')
+    #list_filter = ('author', 'note_id')
 

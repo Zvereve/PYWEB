@@ -1,9 +1,15 @@
-from django.db.models.query import QuerySet
+from typing import Optional
+from django.db.models import QuerySet
 
 
-def author_id_filter(self, queryset: QuerySet):
-    ...
 
+def author_id_filter(queryset:QuerySet, author_id:Optional[int]):
+    if author_id:
+        return queryset.filter(author_id=author_id)
+    else:
+        return queryset
+def public_filter(qeryset:QuerySet, public):
+    return qeryset.filter(public=public)
 
 def author__username_filter(self, queryset):
     # https://docs.djangoproject.com/en/4.0/ref/models/querysets/#iexact
