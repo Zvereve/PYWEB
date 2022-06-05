@@ -8,14 +8,16 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 from blog.models import Note, Comment
 from . import serializers, filters
+from django.db.models import Q
 
 
 class NoteListCreateAPIView(APIView):
     """ Представление, которое позволяет вывести весь список записей и добавить новую запись. """
-    permission_classes = (IsAuthenticated, )
+    #permission_classes = (IsAuthenticated, )
 
     def get(self, request: Request):
         objects = Note.objects.all()
+        objects =objects.filter(Q(public=True) | Q(author=self.request.user))
         serializer = serializers.NoteSerializer(
             instance=objects,
             many=True,
@@ -44,17 +46,22 @@ class NoteListCreateAPIView(APIView):
 class NoteDetailAPIView(APIView):
     """ Представление, которое позволяет вывести отдельную запись. """
     def get(self, request, pk):
+
         note = get_object_or_404(Note, pk=pk)
+        if not((note.public == True) or (self.request.user == note.author)):
+            return Response(f"У вас нет прав на просмотр {self.request.user == note.author}", status.HTTP_403_FORBIDDEN)
+
         serializer = serializers.NoteDetailSerializer(
             instance=note,
         )
-        return Response(serializer.data)
+
+        return Response(serializer.data, status.HTTP_200_OK)
 
     def put(self, request, pk):
         """Обновления записи"""
         note = Note.objects.get(pk=pk)
         if self.request.user != note.author:
-            return Response('Вы не автор')
+            return Response('Вы не автор', status.HTTP_403_FORBIDDEN)
 
         serializer = serializers.NoteSerializer(
             instance=note, data=request.data
@@ -86,13 +93,13 @@ class NoteDetailAPIView(APIView):
     def delete(self, request, pk):
         note = Note.objects.get(pk=pk)
         if self.request.user != note.author:
-            return Response('Вы не автор')
+            return Response('Вы не автор', status.HTTP_403_FORBIDDEN)
         try:
             note = Note.objects.get(pk=pk)
             note.delete()
-            return Response("Удален")
+            return Response("Удален", status.HTTP_200_OK)
         except Note.DoesNotExist:
-            return Response("<h2>Note not found</h2>")
+            return Response("Запись не найдена", status.HTTP_404_NOT_FOUND)
 
 
 class PublicNoteListAPIView(ListAPIView):
@@ -100,19 +107,17 @@ class PublicNoteListAPIView(ListAPIView):
     serializer_class = serializers.NoteDetailSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.NoteFilter
+    #permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
         queryset = super().get_queryset()
-
+        queryset = queryset.filter(Q(public=True) | Q(author=self.request.user))
         return queryset\
             .order_by("date_add")\
             .select_related("author") \
             .prefetch_related("comment_set")
 
-    def filter_queryset(self, queryset):
-        public = self.request.query_params.get("Public", True)
 
-        return filters.public_filter(queryset, public)
 
 
 class CommentListCreateAPIView(APIView):

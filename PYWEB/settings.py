@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'blog_api',
 
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
 
 
 ]
@@ -73,7 +73,7 @@ ROOT_URLCONF = 'PYWEB.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
+        'DIRS': [os.path.join(BASE_DIR, 'templates')]
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -164,7 +164,7 @@ LOGGING = {
     }
 }
 
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = '/notes/public/'
 #REST_FRAMEWORK = {'django_filters.rest_framework'}
 
 TOOLBAR_DEBUG = True
@@ -182,9 +182,9 @@ if TOOLBAR_DEBUG:
         logger = logging.getLogger(__name__)
         logger.warning(f"Ошибка импорта.{e}")
 
-REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_AUTHENTICATION_CLASSES':(
-        'rest_framework.authentication.TokenAuthentication',
-    )
-}
+#REST_FRAMEWORK = {
+#    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+#    'DEFAULT_AUTHENTICATION_CLASSES':(
+#        'rest_framework.authentication.TokenAuthentication',
+#    )
+#}
